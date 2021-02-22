@@ -38,8 +38,8 @@ module Enumerable
     result
   end
 
-  def my_any
-    return to_enum(:my_any) unless block_given?
+  def my_any?
+    return to_enum(:my_any?) unless block_given?
 
     result = false
     my_each do |e|
@@ -48,8 +48,8 @@ module Enumerable
     result
   end
 
-  def my_none
-    return to_enum(:my_none) unless block_given?
+  def my_none?
+    return to_enum(:my_none?) unless block_given?
 
     result = true
     my_each do |e|
