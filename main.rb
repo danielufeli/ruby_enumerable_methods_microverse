@@ -2,39 +2,43 @@ module Enumerable
   def my_each
     return to_enum(:my_each) unless block_given?
 
-    (0...length).each do |index|
-      yield self[index]
+    i = 0
+    while i < to_a.length
+      yield to_a[i]
+      i += 1
     end
     self
-  end
-
+  end  
   def my_each_with_index
     return to_enum(:my_each_with_index) unless block_given?
-
-    (0...length).each do |index|
-      yield(self[index], index)
+    
+    i = 0
+    while i < to_a.length
+      yield(to_a[i], i)
+      i += 1
     end
     self
   end
-
   def my_select
     return to_enum(:my_select) unless block_given?
 
-    result = []
-    my_each do |e|
-      output << e if yield e
-    end
-    result
+    new_array = []
+    to_a.my_each { |value| new_array << value if yield value }
+    new_array
   end
-
-  def my_all?
-    return to_enum(:my_all?) unless block_given?
-
-    result = false
-    my_each do |e|
-      result = true if yield e
+  def my_all?(param = nil)
+    if !block_given? && !param
+      to_a.my_each { |val| return false unless val }
+    elsif param.is_a?(Class)
+      to_a.my_each { |val| return false unless val.is_a?(param) }
+    elsif param.is_a?(Regexp)
+      to_a.my_each { |val| return false unless param.match(val) }
+    elsif param
+      to_a.my_each { |val| return false unless val == param }
+    else
+      to_a.my_each { |val| return false unless yield(val) }
     end
-    result
+    true
   end
 
   def my_any?
