@@ -119,7 +119,7 @@ true_array = [1, true, 'hi', []]
 false_array = [1, false, 'hi', []]
 
 def multiply_els(array)
-  array.my_inject(2, '*')
+  array.my_inject(1, '*')
 end
 
 puts '#my_each test'
