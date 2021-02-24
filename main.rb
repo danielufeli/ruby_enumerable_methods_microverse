@@ -1,3 +1,5 @@
+# rubocop: disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+
 module Enumerable
   def my_each
     return to_enum(:my_each) unless block_given?
@@ -8,10 +10,11 @@ module Enumerable
       i += 1
     end
     self
-  end  
+  end
+
   def my_each_with_index
     return to_enum(:my_each_with_index) unless block_given?
-    
+
     i = 0
     while i < to_a.length
       yield(to_a[i], i)
@@ -19,6 +22,7 @@ module Enumerable
     end
     self
   end
+
   def my_select
     return to_enum(:my_select) unless block_given?
 
@@ -26,6 +30,7 @@ module Enumerable
     to_a.my_each { |value| new_array << value if yield value }
     new_array
   end
+
   def my_all?(param = nil)
     if !block_given? && !param
       to_a.my_each { |val| return false unless val }
@@ -41,74 +46,101 @@ module Enumerable
     true
   end
 
-  def my_any?
-    return to_enum(:my_any?) unless block_given?
-
-    result = false
-    my_each do |e|
-      result = true if yield e
+  def my_any?(param = nil)
+    if block_given?
+      to_a.my_each { |item| return true if yield(item) }
+      return false
+    elsif param.nil?
+      to_a.my_each { |item| return true if item }
+    elsif !param.nil? && (param.is_a? Class)
+      to_a.my_each { |item| return true if [item.class, item.class.superclass].include?(param) }
+    elsif !param.nil? && param.instance_of?(Regexp)
+      to_a.my_each { |item| return true if param.match(item) }
+    else
+      to_a.my_each { |item| return true if item == param }
     end
-    result
+    false
   end
 
-  def my_none?
-    return to_enum(:my_none?) unless block_given?
-
-    result = true
-    my_each do |e|
-      result = false if yield e
-    end
-    result
+  def my_none?(res = nil)
+    block_given? ? !my_any?(&Proc.new) : !my_any?(res)
   end
 
-  def my_count
-    return length unless block_given?
-
+  def my_count(par = nil)
     count = 0
-    my_each do |e|
-      count += 1 if yield e
+    if block_given?
+      to_a.my_each { |i| count += 1 if yield(i) }
+    elsif !block_given? && par.nil?
+      count = to_a.length
+    else
+      count = to_a.my_select { |i| i == par }.length
     end
     count
   end
 
-  def my_map
+  def my_map(pro = nil)
     return to_enum(:my_map) unless block_given?
 
     array = []
-    my_each do |e|
-      array << yield(e)
+    if pro.nil?
+      to_a.my_each { |i| array << yield(i) }
+    else
+      to_a.my_each { |i| array << pro.call(i) }
     end
     array
   end
 
-  def my_inject(acc = nil)
-    return to_enum(:my_inject) unless block_given?
-
-    if acc.nil?
-      acc = self[0]
-      index = 1
+  def my_inject(ini = nil, sym = nil)
+    if (!ini.nil? && sym.nil?) && (ini.is_a?(Symbol) || ini.is_a?(String))
+      sym = ini
+      ini = nil
+    end
+    if !block_given? && !sym.nil?
+      to_a.my_each { |i| ini = ini.nil? ? i : ini.send(sym, i) }
     else
-      index = 0
+      to_a.my_each { |i| ini = ini.nil? ? i : yield(ini, i) }
     end
-
-    (index...length).each do |i|
-      acc = yield(acc, self[i])
-    end
-    acc
+    ini
   end
 end
 
-x_array = [2, 3, 4, 5, 6]
+# rubocop: enable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
 
-def multiply_els(arr)
-  arr.my_inject { |acc, value| acc * value }
+array = [6, 19, 19, 25, 7, 30, 20, 27, 22, 19, 18, 29, 12, 31, 2, 12, 0, 32, 1, 20]
+# block = proc { |num| num < (0 + 9) / 2 }
+rang = Range.new(5, 50)
+# false_block = proc { |num| num > 9 }
+# true_block = proc { |num| num <= 9 }
+numbers = [1, 2i, 3.14]
+words = %w[programmer computer house car]
+true_any_array = [nil, false, true, []]
+false_any_array = [nil, false, nil, false]
+true_array = [1, true, 'hi', []]
+false_array = [1, false, 'hi', []]
+
+def multiply_els(array)
+  array.my_inject(2, '*')
 end
 
-multiply_els(x_array)
+puts '#my_each test'
+array.my_each { |num| puts num }
+words.my_each { |word| puts word }
 
-x_array.my_each do |e|
-  puts e * 2
-end
+puts '#my_each_index test'
+array.each_with_index { |guess, index| puts "Guess ##{index} is #{guess}" }
 
-arr = [1, 2, 3, 4, 5]
-puts arr.my_inject
+puts '#my_select test'
+puts(array.select { |val| val == 1 })
+
+puts '#my_all? test'
+puts(true_array.my_all?)
+puts(false_array.my_all?)
+puts numbers.my_all?(Numeric)
+
+puts '#my_any? test'
+puts(true_any_array.my_any?)
+puts(false_any_array.my_any?)
+
+puts '#my_map test'
+puts(array.my_map { |n| n * 2 })
+puts(rang.my_map { |n| n * 2 })
