@@ -106,41 +106,6 @@ end
 
 # rubocop: enable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
 
-array = [6, 19, 19, 25, 7, 30, 20, 27, 22, 19, 18, 29, 12, 31, 2, 12, 0, 32, 1, 20]
-# block = proc { |num| num < (0 + 9) / 2 }
-rang = Range.new(5, 50)
-# false_block = proc { |num| num > 9 }
-# true_block = proc { |num| num <= 9 }
-numbers = [1, 2i, 3.14]
-words = %w[programmer computer house car]
-true_any_array = [nil, false, true, []]
-false_any_array = [nil, false, nil, false]
-true_array = [1, true, 'hi', []]
-false_array = [1, false, 'hi', []]
-
 def multiply_els(array)
   array.my_inject(1, '*')
 end
-
-puts '#my_each test'
-array.my_each { |num| puts num }
-words.my_each { |word| puts word }
-
-puts '#my_each_index test'
-array.each_with_index { |guess, index| puts "Guess ##{index} is #{guess}" }
-
-puts '#my_select test'
-puts(array.select { |val| val == 1 })
-
-puts '#my_all? test'
-puts(true_array.my_all?)
-puts(false_array.my_all?)
-puts numbers.my_all?(Numeric)
-
-puts '#my_any? test'
-puts(true_any_array.my_any?)
-puts(false_any_array.my_any?)
-
-puts '#my_map test'
-puts(array.my_map { |n| n * 2 })
-puts(rang.my_map { |n| n * 2 })
