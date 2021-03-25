@@ -105,3 +105,7 @@ module Enumerable
 end
 
 # rubocop: enable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
+
+def multiply_els(array)
+  array.my_inject(1, '*')
+end

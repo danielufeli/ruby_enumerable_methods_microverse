@@ -194,4 +194,10 @@ describe Enumerable do
       expect { num.my_inject }.to raise_error(LocalJumpError)
     end
   end
+  describe '#multiply_els' do
+    it 'Test multiply_els method' do
+      expect($stdout).to receive(:puts).with(323_190_000)
+      puts multiply_els(array)
+    end
+  end
 end
