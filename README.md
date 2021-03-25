@@ -12,6 +12,7 @@ To get a local copy up and running follow these simple example steps.
 - Go to the main page of the repo.
 - Press the "Code" button and get the repo link.
 - git clone.
+- type rspec to test
 
 ## ✒️ Author
 
